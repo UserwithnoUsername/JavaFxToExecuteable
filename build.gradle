@@ -1,0 +1,104 @@
+plugins {
+  id 'java'
+  id 'application'
+  id 'eclipse'
+  id 'org.javamodularity.moduleplugin' version '1.8.15'
+  id 'org.openjfx.javafxplugin' version '0.0.12'
+  id 'org.beryx.jlink' version '3.0.1'
+}
+
+def currentOS = org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.currentOperatingSystem;
+def platform
+if (currentOS.isWindows()) {
+  platform = 'win'
+} else if (currentOS.isLinux()) {
+  platform = 'linux'
+} else if (currentOS.isMacOsX()) {
+  platform = 'mac'
+}
+
+group 'com.worstCode'
+version '1.0-SNAPSHOT'
+
+repositories {
+  mavenCentral()
+}
+
+ext {
+  junitVersion = '5.10.0'
+}
+
+sourceCompatibility = '21'
+targetCompatibility = '21'
+
+tasks.withType(JavaCompile) {
+  options.encoding = 'UTF-8'
+}
+
+application {
+  mainModule = 'com.worstcode.creationkit'
+  mainClass = 'com.worstcode.creationkit.HelloApplication'
+}
+
+javafx {
+  version = '21'
+  modules = ['javafx.controls', 'javafx.fxml','javafx.base','javafx.graphics','javafx.media','javafx.web']
+}
+
+dependencies {
+  implementation "org.openjfx:javafx-base:21.0.3:${platform}"
+  implementation "org.openjfx:javafx-controls:21.0.3:${platform}"
+  implementation "org.openjfx:javafx-fxml:21.0.3:${platform}"
+  implementation "org.openjfx:javafx-graphics:21.0.3:${platform}"
+  implementation "org.openjfx:javafx-media:21.0.3:${platform}"
+  implementation "org.openjfx:javafx-web:21.0.3:${platform}"
+  testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+}
+
+test {
+useJUnitPlatform()}
+
+
+
+
+
+java {
+  modularity.inferModulePath = true
+}
+
+
+
+dependencies {
+
+}
+
+eclipse {
+  classpath {
+    file {
+      whenMerged {
+        entries.findAll { it.properties.kind.equals('lib') }.each {
+          it.entryAttributes['module'] = 'true'
+        }
+      }
+    }
+  }
+}
+
+jlink {
+
+  options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+
+  jpackage {
+    skipInstaller = false
+    //{"app-image", "exe", "msi", "rpm", "deb", "pkg", "dmg"}
+    if(platform =='linux'){
+      installerType = 'rpm'
+    }
+    installerOptions += ['--app-version', version.replace('-', '.')]
+  }
+
+  launcher {
+    name = 'BinaryName'
+  }
+}
