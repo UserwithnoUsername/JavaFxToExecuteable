@@ -20,7 +20,6 @@
         <TextField fx:id="username" GridPane.columnIndex="1"/>
         <Label text="Password" GridPane.rowIndex="1"/>
         <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-        <Button text="Login" onAction="#onLoginButtonClick" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
     </GridPane>
 
 </VBox>
